@@ -1,11 +1,13 @@
 package org.app.bot.telegram;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.app.bot.telegram.button.DictMockButton;
 import org.app.bot.telegram.button.DictProblemButton;
 import org.app.bot.telegram.button.MainMenuButton;
 import org.app.bot.telegram.config.TelegramBotConfig;
+import org.app.bot.telegram.property.loader.PropertyButtonLoader;
 import org.app.bot.telegram.session.Session;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -17,6 +19,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Flow;
 
 @Component
 @AllArgsConstructor
@@ -28,6 +32,15 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final MainMenuButton mainMenuButton;
     private final DictMockButton dictMockButton;
     private final DictProblemButton dictProblemButton;
+
+    private final PropertyButtonLoader propertyButtonLoader;
+
+    private Map<String, Flow.Subscriber> subscribers;
+
+    @PostConstruct
+    private void init() {
+        subscribers = propertyButtonLoader.loadSubscribers("src/main/resources/telegram_bot.properties");
+    }
 
     @Override
     public String getBotUsername() {
