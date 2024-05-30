@@ -19,10 +19,4 @@ public class DictProblemButton extends KeyboardButton {
     public void setButtonName() {
         setText(DictProblemButton.DICT_NAME);
     }
-
-    public ReplyKeyboardMarkup getReplyMarkup(MainMenuButton mainMenuButton) {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setKeyboard(List.of(new KeyboardRow(List.of(mainMenuButton))));
-        return keyboardMarkup;
-    }
 }

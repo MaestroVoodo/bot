@@ -1,6 +1,7 @@
 package org.app.bot.telegram;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.app.bot.telegram.button.DictMockButton;
 import org.app.bot.telegram.button.DictProblemButton;
 import org.app.bot.telegram.button.MainMenuButton;
@@ -11,7 +12,11 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -43,11 +48,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         // Обработчик нажатия кнопки
         if (DictMockButton.DICT_NAME.equals(messageText)) {
-            response = buildResponse(update, dictMockButton.getReplyMarkup(mainMenuButton), "Введите название справочника:");
+            response = buildResponse(update, getReplyMarkup(mainMenuButton), "Введите название справочника:");
         } else if (DictProblemButton.DICT_NAME.equals(messageText)) {
-            response = buildResponse(update, dictProblemButton.getReplyMarkup(mainMenuButton),DictProblemButton.DICT_NAME);
-        } else  {
-            response = buildResponse(update, mainMenuButton.getReplyMarkup(dictMockButton, dictProblemButton), "Выберите одну из кнопок:");
+            response = buildResponse(update, getReplyMarkup(mainMenuButton), DictProblemButton.DICT_NAME);
+        } else {
+            response = buildResponse(update, getReplyMarkup(dictMockButton, dictProblemButton), "Выберите одну из кнопок:");
         }
 
         try {
@@ -64,5 +69,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         response.setReplyMarkup(keyboardMarkup);
 
         return response;
+    }
+
+    @NonNull
+    public ReplyKeyboardMarkup getReplyMarkup(KeyboardButton... buttons) {
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setKeyboard(List.of(new KeyboardRow(List.of(buttons))));
+        return keyboardMarkup;
     }
 }

@@ -24,10 +24,4 @@ public class DictMockButton extends KeyboardButton {
     public void setButtonName() {
         setText(DictMockButton.DICT_NAME);
     }
-
-    public ReplyKeyboardMarkup getReplyMarkup(MainMenuButton mainMenuButton) {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setKeyboard(List.of(new KeyboardRow(List.of(mainMenuButton))));
-        return keyboardMarkup;
-    }
 }
