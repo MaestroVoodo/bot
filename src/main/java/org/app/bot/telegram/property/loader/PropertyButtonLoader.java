@@ -3,8 +3,8 @@ package org.app.bot.telegram.property.loader;
 import org.app.bot.telegram.util.ClassUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Flow;
@@ -18,8 +18,8 @@ public class PropertyButtonLoader extends PropertyLoader {
         super(classUtils);
     }
 
-    public Map<String, Flow.Subscriber> loadSubscribers(String fileName) {
-        Map<String, Flow.Subscriber> publishers = new HashMap<>();
+    public List<Flow.Subscriber> loadSubscribers(String fileName) {
+        List<Flow.Subscriber> publishers = new ArrayList<>();
         Properties properties = load(fileName);
         Set<String> propertyNames = properties.stringPropertyNames();
 
@@ -28,7 +28,7 @@ public class PropertyButtonLoader extends PropertyLoader {
             Flow.Subscriber publisher = getClassUtils().getBean(className, Flow.Subscriber.class);
 
             if (nonNull(publisher)) {
-                publishers.put(key, publisher);
+                publishers.add(publisher);
             }
         }
         return publishers;

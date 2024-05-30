@@ -1,27 +1,15 @@
 package org.app.bot.telegram.button;
 
-import jakarta.annotation.PostConstruct;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
 import java.util.concurrent.Flow;
 
-/**
- * Кнопка {@value #BUTTON_NAME}
- */
-@Setter
 @Component
-public class DictMockButton extends KeyboardButton implements Flow.Subscriber {
+public class ButtonSubscriber extends KeyboardButton implements Flow.Subscriber {
 
-    public static final String BUTTON_NAME = "Тип справочника (Mock/НСИ)";
-
+    private String buttonName;
     private Flow.Subscription subscription;
-
-    @PostConstruct
-    public void setButtonText() {
-        setText(DictMockButton.BUTTON_NAME);
-    }
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
@@ -42,6 +30,6 @@ public class DictMockButton extends KeyboardButton implements Flow.Subscriber {
 
     @Override
     public void onComplete() {
-        System.out.println(BUTTON_NAME + " is complete");
+        System.out.println(buttonName + " is complete");
     }
 }
