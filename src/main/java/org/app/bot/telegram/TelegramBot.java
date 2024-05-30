@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.app.bot.telegram.config.TelegramBotConfig;
-import org.app.bot.telegram.property.loader.PropertyButtonLoader;
+import org.app.bot.telegram.property.loader.SubscriptionButtonLoader;
 import org.app.bot.telegram.session.Session;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -24,7 +24,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final TelegramBotConfig config;
     private final Session session;
-    private final PropertyButtonLoader propertyButtonLoader;
+    private final SubscriptionButtonLoader propertyButtonLoader;
 
     private final SubmissionPublisher<String> publisher = new SubmissionPublisher<>();
 
