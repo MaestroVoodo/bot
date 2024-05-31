@@ -12,9 +12,9 @@ import java.util.concurrent.Flow;
 import static java.util.Objects.nonNull;
 
 @Component
-public class SubscriptionButtonLoader extends PropertyLoader {
+public class SubscriberButtonLoader extends PropertyLoader {
 
-    public SubscriptionButtonLoader(ClassUtils classUtils) {
+    public SubscriberButtonLoader(ClassUtils classUtils) {
         super(classUtils);
     }
 

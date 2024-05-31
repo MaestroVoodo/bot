@@ -3,8 +3,12 @@ package org.app.bot.telegram;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.app.bot.telegram.button.DictMockButton;
+import org.app.bot.telegram.button.DictProblemButton;
+import org.app.bot.telegram.button.MainMenuButton;
 import org.app.bot.telegram.config.TelegramBotConfig;
-import org.app.bot.telegram.property.loader.SubscriptionButtonLoader;
+import org.app.bot.telegram.property.loader.Subscriber;
+import org.app.bot.telegram.property.loader.SubscriberButtonLoader;
 import org.app.bot.telegram.session.Session;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,8 +17,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
@@ -22,16 +28,21 @@ import java.util.concurrent.SubmissionPublisher;
 @AllArgsConstructor
 public class TelegramBot extends TelegramLongPollingBot {
 
+    private final MainMenuButton mainMenuButton;
+    private final DictMockButton dictMockButton;
+    private final DictProblemButton dictProblemButton;
+
     private final TelegramBotConfig config;
     private final Session session;
-    private final SubscriptionButtonLoader propertyButtonLoader;
-
-    private final SubmissionPublisher<String> publisher = new SubmissionPublisher<>();
+    private final Subscriber subscriber;
+//    private final SubscriberButtonLoader propertyButtonLoader;
+//    private final SubmissionPublisher<String> publisher = new SubmissionPublisher<>();
 
     @PostConstruct
     private void init() {
-        List<Flow.Subscriber> subscribers = propertyButtonLoader.loadSubscribers("src/main/resources/telegram_bot.properties");
-        subscribers.forEach(publisher::subscribe);
+        subscriber.subscribe();
+//        List<Flow.Subscriber> subscribers = propertyButtonLoader.loadSubscribers("src/main/resources/telegram_bot.properties");
+//        subscribers.forEach(publisher::subscribe);
     }
 
     @Override
@@ -50,24 +61,27 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String messageText = update.getMessage().getText();
 
-        publisher.submit(messageText);
+        subscriber.getPublisher().submit(messageText);
 
 //        SendMessage response;
 //
 //        // Обработчик нажатия кнопки
-//        if (DictMockButton.DICT_NAME.equals(messageText)) {
+//        if (DictMockButton.BUTTON_NAME.equals(messageText)) {
 //            response = buildResponse(update, getReplyMarkup(mainMenuButton), "Введите название справочника:");
-//        } else if (DictProblemButton.DICT_NAME.equals(messageText)) {
-//            response = buildResponse(update, getReplyMarkup(mainMenuButton), DictProblemButton.DICT_NAME);
+//        } else if (DictProblemButton.BUTTON_NAME.equals(messageText)) {
+//            response = buildResponse(update, getReplyMarkup(mainMenuButton), DictProblemButton.BUTTON_NAME);
 //        } else {
 //            response = buildResponse(update, getReplyMarkup(dictMockButton, dictProblemButton), "Выберите одну из кнопок:");
 //        }
 
-//        try {
-//            execute(response);
-//        } catch (TelegramApiException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            SendMessage sendMessage = session.getSendMessage();
+            if(Objects.nonNull(sendMessage)) {
+                execute(sendMessage);
+            }
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     private static SendMessage buildResponse(Update update, ReplyKeyboardMarkup keyboardMarkup, String message) {

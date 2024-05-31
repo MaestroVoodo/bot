@@ -3,7 +3,7 @@ package org.app.bot.telegram.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DictMockService {
+public class DictProblemService {
 
     private static final String IS_MOCK = "Мок";
     private static final String REAL = "НСИ";
