@@ -3,16 +3,15 @@ package org.app.bot.telegram.button;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.app.bot.telegram.property.loader.Subscriber;
 import org.app.bot.telegram.service.DictProblemService;
 import org.app.bot.telegram.session.Session;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.app.bot.telegram.subscriber.LatchableSubscriber;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Flow;
-
-import static org.app.bot.telegram.property.loader.Subscriber.TURN_CLICKED_ANOTHER_BUTTONS_OFF;
 
 /**
  * Кнопка {@value #BUTTON_NAME}
@@ -20,16 +19,13 @@ import static org.app.bot.telegram.property.loader.Subscriber.TURN_CLICKED_ANOTH
 @Setter
 @Component
 @RequiredArgsConstructor
-public class DictProblemButton extends KeyboardButton implements Flow.Subscriber {
+public class DictProblemButton extends KeyboardButton implements LatchableSubscriber<Update> {
 
     public static final String BUTTON_NAME = "Ошибки загрузки справочников";
     private final Session session;
     private Flow.Subscription subscription;
     private final DictProblemService service;
-
-    @Autowired
-    private Subscriber subscriber;
-    boolean clicked;
+    private CountDownLatch latch;
 
     @PostConstruct
     public void setButtonText() {
@@ -43,22 +39,8 @@ public class DictProblemButton extends KeyboardButton implements Flow.Subscriber
     }
 
     @Override
-    public void onNext(Object item) {
-        String inputMessage = String.valueOf(item);
-
-        if (TURN_CLICKED_ANOTHER_BUTTONS_OFF.equals(inputMessage)) {
-            clicked = false;
-        }
-
-        if (clicked) {
-            service.call(inputMessage);
-        }
-
-        if (BUTTON_NAME.equals(inputMessage)) {
-            clicked = true;
-            session.setLastButtonNameClicked(BUTTON_NAME);
-        }
-
+    public void onNext(Update update) {
+        latch.countDown();
         subscription.request(1);
     }
 

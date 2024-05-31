@@ -3,16 +3,16 @@ package org.app.bot.telegram.button;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.app.bot.telegram.property.loader.Subscriber;
 import org.app.bot.telegram.service.MainMenuService;
 import org.app.bot.telegram.session.Session;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.app.bot.telegram.subscriber.LatchableSubscriber;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Flow;
 
 /**
@@ -21,16 +21,13 @@ import java.util.concurrent.Flow;
 @Setter
 @Component
 @RequiredArgsConstructor
-public class MainMenuButton extends KeyboardButton implements Flow.Subscriber {
+public class MainMenuButton extends KeyboardButton implements LatchableSubscriber<Update> {
 
     public static final String BUTTON_NAME = "Вернуться в меню";
     private final Session session;
     private final MainMenuService service;
     private Flow.Subscription subscription;
-
-    @Autowired
-    private Subscriber subscriber;
-    boolean clicked;
+    private CountDownLatch latch;
 
     @PostConstruct
     public void setButtonText() {
@@ -44,8 +41,7 @@ public class MainMenuButton extends KeyboardButton implements Flow.Subscriber {
     }
 
     @Override
-    public void onNext(Object item) {
-        Update update = (Update) (item);
+    public void onNext(Update update) {
 
         String input = Optional.ofNullable(update)
                 .map(Update::getMessage)
@@ -58,7 +54,7 @@ public class MainMenuButton extends KeyboardButton implements Flow.Subscriber {
             session.update(update);
             service.sendMenu();
         }
-
+        latch.countDown();
         subscription.request(1);
     }
 
