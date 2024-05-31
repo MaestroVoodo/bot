@@ -14,9 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.util.List;
 
-import static org.app.bot.telegram.button.DictMockButton.BUTTON_NAME;
 import static org.app.bot.telegram.button.DictMockButton.INPUT_DICT_NAME;
-import static org.app.bot.telegram.property.loader.Subscriber.TURN_CLICKED_ANOTHER_BUTTONS_OFF;
 
 @Service
 @RequiredArgsConstructor
@@ -30,21 +28,10 @@ public class DictMockService {
 
 
     public void call(String message) {
-
-        SendMessage response = null;
-
-        if (BUTTON_NAME.equals(message)) {
-            response = createResponse(
-                    session.getUpdate(),
-                    getReplyMarkup(classUtils.getBean(MainMenuButton.class.getSimpleName(), MainMenuButton.class)),
-                    INPUT_DICT_NAME);
-
-        } else if (!TURN_CLICKED_ANOTHER_BUTTONS_OFF.equals(message)) {
-            response = createResponse(
-                    session.getUpdate(),
-                    getReplyMarkup(classUtils.getBean(MainMenuButton.class.getSimpleName(), MainMenuButton.class)),
-                    "Введено и обработано: " + message);
-        }
+        SendMessage response = createResponse(
+                session.getUpdate(),
+                getReplyMarkup(classUtils.getBean(MainMenuButton.class.getSimpleName(), MainMenuButton.class)),
+                message);
 
         session.setSendMessage(response);
     }

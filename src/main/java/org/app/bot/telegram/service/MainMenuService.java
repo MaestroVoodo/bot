@@ -23,7 +23,7 @@ public class MainMenuService {
     private final Session session;
     private final ClassUtils classUtils;
 
-    public void call(String inputMessage) {
+    public void sendMenu() {
         DictMockButton dictMockButton = classUtils.getBean(DictMockButton.class.getSimpleName(), DictMockButton.class);
         DictProblemButton dictProblemButton = classUtils.getBean(DictProblemButton.class.getSimpleName(), DictProblemButton.class);
         ReplyKeyboardMarkup replyMarkup = getReplyMarkup(dictMockButton, dictProblemButton);

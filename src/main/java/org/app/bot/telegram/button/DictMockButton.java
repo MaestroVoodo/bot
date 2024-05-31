@@ -3,16 +3,15 @@ package org.app.bot.telegram.button;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.app.bot.telegram.property.loader.Subscriber;
 import org.app.bot.telegram.service.DictMockService;
 import org.app.bot.telegram.session.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
+import java.util.Optional;
 import java.util.concurrent.Flow;
-
-import static org.app.bot.telegram.property.loader.Subscriber.TURN_CLICKED_ANOTHER_BUTTONS_OFF;
 
 /**
  * Кнопка {@value #BUTTON_NAME}
@@ -28,10 +27,6 @@ public class DictMockButton extends KeyboardButton implements Flow.Subscriber {
     private final DictMockService service;
     private Flow.Subscription subscription;
 
-    @Autowired
-    private Subscriber subscriber;
-    boolean clicked;
-
     @PostConstruct
     public void setButtonText() {
         setText(DictMockButton.BUTTON_NAME);
@@ -45,19 +40,21 @@ public class DictMockButton extends KeyboardButton implements Flow.Subscriber {
 
     @Override
     public void onNext(Object item) {
-        String inputMessage = String.valueOf(item);
+        Update update = (Update) (item);
 
-        if (TURN_CLICKED_ANOTHER_BUTTONS_OFF.equals(inputMessage) && !session.getLastButtonNameClicked().equals(BUTTON_NAME)) {
-            clicked = false;
-        }
+        String input = Optional.ofNullable(update)
+                .map(Update::getMessage)
+                .map(Message::getText)
+                .orElse(null);
 
-        if (clicked && !TURN_CLICKED_ANOTHER_BUTTONS_OFF.equals(inputMessage)) {
-            service.call(inputMessage);
-        } else if (BUTTON_NAME.equals(inputMessage)) {
-            clicked = true;
-            session.setLastButtonNameClicked(BUTTON_NAME);
-            subscriber.getPublisher().submit(TURN_CLICKED_ANOTHER_BUTTONS_OFF);
+        boolean isClicked = BUTTON_NAME.equals(input);
+        boolean isLastClicked = BUTTON_NAME.equals(session.getLastButtonNameClicked());
+
+        if (isClicked) {
+            session.update(update);
             service.call(INPUT_DICT_NAME);
+        } else if (isLastClicked) {
+            service.call(input);
         }
 
         subscription.request(1);

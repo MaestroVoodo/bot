@@ -57,7 +57,6 @@ public class DictProblemButton extends KeyboardButton implements Flow.Subscriber
         if (BUTTON_NAME.equals(inputMessage)) {
             clicked = true;
             session.setLastButtonNameClicked(BUTTON_NAME);
-            subscriber.getPublisher().submit(TURN_CLICKED_ANOTHER_BUTTONS_OFF);
         }
 
         subscription.request(1);

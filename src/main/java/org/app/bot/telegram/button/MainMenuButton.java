@@ -8,11 +8,12 @@ import org.app.bot.telegram.service.MainMenuService;
 import org.app.bot.telegram.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
+import java.util.Optional;
 import java.util.concurrent.Flow;
-
-import static org.app.bot.telegram.property.loader.Subscriber.TURN_CLICKED_ANOTHER_BUTTONS_OFF;
 
 /**
  * Кнопка {@value #BUTTON_NAME}
@@ -44,21 +45,18 @@ public class MainMenuButton extends KeyboardButton implements Flow.Subscriber {
 
     @Override
     public void onNext(Object item) {
-        String inputMessage = String.valueOf(item);
+        Update update = (Update) (item);
 
-        if (TURN_CLICKED_ANOTHER_BUTTONS_OFF.equals(inputMessage)) {
-            clicked = false;
-        }
+        String input = Optional.ofNullable(update)
+                .map(Update::getMessage)
+                .map(Message::getText)
+                .orElse(null);
 
-        if (clicked) {
-            service.call(inputMessage);
-        }
+        boolean isClicked = BUTTON_NAME.equals(input);
 
-        if (BUTTON_NAME.equals(inputMessage)) {
-            clicked = true;
-            session.setLastButtonNameClicked(BUTTON_NAME);
-            subscriber.getPublisher().submit(TURN_CLICKED_ANOTHER_BUTTONS_OFF);
-            service.call(inputMessage);
+        if (isClicked) {
+            session.update(update);
+            service.sendMenu();
         }
 
         subscription.request(1);
