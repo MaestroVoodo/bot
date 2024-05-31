@@ -14,18 +14,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.util.List;
 
-import static org.app.bot.telegram.button.DictMockButton.INPUT_DICT_NAME;
-
 @Service
 @RequiredArgsConstructor
 public class DictMockService {
 
     private final Session session;
     private final ClassUtils classUtils;
-
-    private static final String IS_MOCK = "Мок";
-    private static final String REAL = "НСИ";
-
 
     public void call(String message) {
         SendMessage response = createResponse(
