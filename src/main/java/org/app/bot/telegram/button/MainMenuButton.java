@@ -19,6 +19,7 @@ import static org.app.bot.telegram.service.UpdateService.getMessageText;
 public class MainMenuButton extends BaseButton {
 
     public static final String BUTTON_NAME = "Вернуться в меню";
+
     private final Session session;
     private final ButtonMainMenuService service;
 

@@ -19,7 +19,7 @@ import static org.app.bot.telegram.service.UpdateService.getMessageText;
 public class DictProblemButton extends BaseButton {
 
     public static final String BUTTON_NAME = "Ошибки загрузки справочников";
-    public static final String PLEASE_INPUT_ENV_NAME = "Введите имя стенда:";
+    public static final String ENTER_INPUT_ENV_NAME = "Введите имя стенда:";
 
     private final Session session;
     private final ButtonDictProblemService service;
@@ -36,7 +36,7 @@ public class DictProblemButton extends BaseButton {
 
         if (isClicked) {
             session.update(update);
-            service.call(PLEASE_INPUT_ENV_NAME);
+            service.call(ENTER_INPUT_ENV_NAME);
         } else if (isLastClicked) {
             service.call(getMessageText(update));
         }

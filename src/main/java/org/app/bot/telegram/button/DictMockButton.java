@@ -19,7 +19,7 @@ import static org.app.bot.telegram.service.UpdateService.getMessageText;
 public class DictMockButton extends BaseButton {
 
     public static final String BUTTON_NAME = "Тип справочника (Mock/НСИ)";
-    public static final String PLEASE_INPUT_DICT_NAME = "Введите имя справочника";
+    public static final String ENTER_DICT_NAME = "Введите имя справочника";
 
     private final Session session;
     private final ButtonDictMockService service;
@@ -36,7 +36,7 @@ public class DictMockButton extends BaseButton {
 
         if (isClicked) {
             session.update(update);
-            service.call(PLEASE_INPUT_DICT_NAME);
+            service.call(ENTER_DICT_NAME);
         } else if (isLastClicked) {
             service.call(getMessageText(update));
         }
