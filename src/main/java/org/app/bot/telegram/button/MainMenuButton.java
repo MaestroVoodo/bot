@@ -34,7 +34,7 @@ public class MainMenuButton extends BaseButton {
 
         if (isClicked) {
             session.update(update);
-            service.sendMenu();
+            service.call();
         }
     }
 }

@@ -18,7 +18,7 @@ public class ButtonMainMenuService extends MessageService {
     private final Session session;
     private final ClassUtils classUtils;
 
-    public void sendMenu() {
+    public void call() {
         DictMockButton dictMockButton = classUtils.getBean(DictMockButton.class.getSimpleName(), DictMockButton.class);
         DictProblemButton dictProblemButton = classUtils.getBean(DictProblemButton.class.getSimpleName(), DictProblemButton.class);
         ReplyKeyboardMarkup replyMarkup = getReplyMarkup(dictMockButton, dictProblemButton);
