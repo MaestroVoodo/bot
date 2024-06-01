@@ -16,4 +16,11 @@ public class UpdateService {
                 .map(Object::toString)
                 .orElse(null);
     }
+
+    public static String getMessageText(Update update) {
+        return ofNullable(update)
+                .map(Update::getMessage)
+                .map(Message::getText)
+                .orElse(null);
+    }
 }

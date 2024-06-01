@@ -6,10 +6,9 @@ import lombok.Setter;
 import org.app.bot.telegram.service.button.ButtonDictMockService;
 import org.app.bot.telegram.session.Session;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import static java.util.Optional.ofNullable;
+import static org.app.bot.telegram.service.UpdateService.getMessageText;
 
 /**
  * Кнопка {@value #BUTTON_NAME}
@@ -32,19 +31,14 @@ public class DictMockButton extends BaseButton {
 
     @Override
     public void click(Update update) {
-        String input = ofNullable(update)
-                .map(Update::getMessage)
-                .map(Message::getText)
-                .orElse(null);
-
-        boolean isClicked = BUTTON_NAME.equals(input);
+        boolean isClicked = BUTTON_NAME.equals(getMessageText(update));
         boolean isLastClicked = BUTTON_NAME.equals(session.getLastButtonNameClicked());
 
         if (isClicked) {
             session.update(update);
             service.call(PLEASE_INPUT_DICT_NAME);
         } else if (isLastClicked) {
-            service.call(input);
+            service.call(getMessageText(update));
         }
     }
 }
