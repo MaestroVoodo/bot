@@ -1,11 +1,7 @@
 package org.app.bot.telegram.service;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.app.bot.telegram.button.MainMenuButton;
-import org.app.bot.telegram.session.Session;
-import org.app.bot.telegram.util.ClassUtils;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -14,25 +10,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class DictMockService {
+@Component
+public class MessageService extends UpdateService {
 
-    private final Session session;
-    private final ClassUtils classUtils;
-
-    public void call(String message) {
-        SendMessage response = createResponse(
-                session.getUpdate(),
-                getReplyMarkup(classUtils.getBean(MainMenuButton.class.getSimpleName(), MainMenuButton.class)),
-                message);
-
-        session.setSendMessage(response);
-    }
-
-    private static SendMessage createResponse(Update update, ReplyKeyboardMarkup keyboardMarkup, String message) {
+    public SendMessage createResponse(Update update, ReplyKeyboardMarkup keyboardMarkup, String message) {
         SendMessage response = new SendMessage();
-        response.setChatId(update.getMessage().getChatId().toString());
+        response.setChatId(getChatId(update));
         response.setText(message);
         response.setReplyMarkup(keyboardMarkup);
 

@@ -3,17 +3,13 @@ package org.app.bot.telegram.button;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.app.bot.telegram.service.DictMockService;
+import org.app.bot.telegram.service.button.ButtonDictMockService;
 import org.app.bot.telegram.session.Session;
-import org.app.bot.telegram.subscriber.LatchableSubscriber;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Flow;
+import static java.util.Optional.ofNullable;
 
 /**
  * Кнопка {@value #BUTTON_NAME}
@@ -21,14 +17,13 @@ import java.util.concurrent.Flow;
 @Setter
 @Component
 @RequiredArgsConstructor
-public class DictMockButton extends KeyboardButton implements LatchableSubscriber<Update> {
+public class DictMockButton extends BaseButton {
 
     public static final String BUTTON_NAME = "Тип справочника (Mock/НСИ)";
-    public static final String INPUT_DICT_NAME = "Введите имя справочника";
+    public static final String PLEASE_INPUT_DICT_NAME = "Введите имя справочника";
+
     private final Session session;
-    private final DictMockService service;
-    private Flow.Subscription subscription;
-    private CountDownLatch latch;
+    private final ButtonDictMockService service;
 
     @PostConstruct
     public void setButtonText() {
@@ -36,15 +31,8 @@ public class DictMockButton extends KeyboardButton implements LatchableSubscribe
     }
 
     @Override
-    public void onSubscribe(Flow.Subscription subscription) {
-        this.subscription = subscription;
-        subscription.request(1);
-    }
-
-    @Override
-    public void onNext(Update update) {
-
-        String input = Optional.ofNullable(update)
+    public void click(Update update) {
+        String input = ofNullable(update)
                 .map(Update::getMessage)
                 .map(Message::getText)
                 .orElse(null);
@@ -54,22 +42,9 @@ public class DictMockButton extends KeyboardButton implements LatchableSubscribe
 
         if (isClicked) {
             session.update(update);
-            service.call(INPUT_DICT_NAME);
+            service.call(PLEASE_INPUT_DICT_NAME);
         } else if (isLastClicked) {
             service.call(input);
         }
-
-        latch.countDown();
-        subscription.request(1);
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        throwable.printStackTrace();
-    }
-
-    @Override
-    public void onComplete() {
-        System.out.println(BUTTON_NAME + " is complete");
     }
 }
