@@ -13,14 +13,15 @@ import java.util.Properties;
 @Component
 public class PropertyLoader {
 
-    public static final String BUTTON_PROPERTY_FILE_PATH = "/telegram_bot.properties";
+    public static final String BUTTON_PROPERTY_FILE_PATH = "/buttons.properties";
+    public static final String USER_PROPERTY_FILE_PATH = "/users.properties";
 
-    public Map<String, String> loadButtonConfig() {
+    public Map<String, String> loadProperty(String propertyFilePath) {
         Map<String, String> buttonConfigMap = new HashMap<>();
 
-        try (InputStream input = getClass().getResourceAsStream(BUTTON_PROPERTY_FILE_PATH)) {
+        try (InputStream input = getClass().getResourceAsStream(propertyFilePath)) {
             if (input == null) {
-                throw new RuntimeException("Не найден файл конфигурации: " + BUTTON_PROPERTY_FILE_PATH);
+                throw new RuntimeException("Не найден файл конфигурации: " + propertyFilePath);
             }
 
             Properties properties = new Properties();
@@ -31,7 +32,7 @@ public class PropertyLoader {
                 buttonConfigMap.put(key, value);
             }
         } catch (IOException ex) {
-            throw new RuntimeException("Ошибка чтения файла конфигцрации", ex);
+            throw new RuntimeException("Ошибка чтения файла конфигурации", ex);
         }
 
         return buttonConfigMap;

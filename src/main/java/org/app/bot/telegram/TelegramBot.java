@@ -1,8 +1,9 @@
 package org.app.bot.telegram;
 
 import lombok.RequiredArgsConstructor;
-import org.app.bot.telegram.service.button.ButtonService;
 import org.app.bot.telegram.config.TelegramBotConfig;
+import org.app.bot.telegram.service.UserService;
+import org.app.bot.telegram.service.button.ButtonService;
 import org.app.bot.telegram.session.Session;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -16,6 +17,7 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class TelegramBot extends TelegramLongPollingBot {
 
+    private final UserService userService;
     private final ButtonService buttonService;
     private final TelegramBotConfig config;
     private final Session session;
@@ -32,7 +34,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        userService.checkRegistration(update);
         buttonService.click(update);
+
         sendMessage(session.getSendMessage());
     }
 
